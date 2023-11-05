@@ -1,0 +1,254 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: E-commerce API
+  description: API for E-commerce platform
+  contact:
+    email: alharbi.farah@hotmail.com
+  
+servers:
+  - url: http://localhost:3001
+  
+tags: 
+  - name: products
+    description: every thing about products
+  - name: users
+    description: every thing about users
+  - name: orders
+    description: every thing about orders
+  - name: category
+    description: every thing about category
+    
+  
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - title
+        - price
+        - category
+      properties:
+        id:
+          type: string
+          description: the id of the product will be automatically generated in the backend
+        title:
+          type: string
+          description: the title of the product 
+        price:
+          type: number
+          description: the price of the product
+        description:
+          type: string
+          description: the description of the product 
+        category:
+          type: string
+          description: the category of the product
+        image:
+          type: string
+          description: the url of the product image
+        rating:
+          type: object
+          properties:
+            rate:
+              type: number
+            count:
+              type: number
+      example:
+        id: 1
+        title: apple iphone 13
+        price: 1220
+        description: beautiful phone with high resoulution camera
+        category: smart phone
+        image: https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg
+        rating:
+          rate: 3.9
+          count: 120
+          
+    User:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        id:
+          type: string
+          description: the id of the user will be automatically generated in the backend
+        name:
+          type: string
+          description: the name of the user 
+        email:
+          type: string
+          description: the email of the user
+        password:
+          type: number
+          description: the password of the user 
+      example:
+        id: 1
+        name: farah alharbi
+        email: alharbi.farah@hotmail.com
+        password: 123456
+        
+    Order:
+      type: object
+      required:
+        - id
+        - products
+        - totalPrice
+      properties:
+        id:
+          type: string
+          description: the id of the order will be automatically generated in the backend
+        products:
+          type: array
+          description: the name of the order
+          items: 
+            $ref: '#/components/schemas/Product'
+        totalPrice:
+          type: number
+          description: the price of the order
+      example:
+        id: 1
+        name: farah alharbi
+        email: alharbi.farah@hotmail.com
+        password: 123456
+        
+        
+paths:
+  /products:
+    get: 
+      tags: 
+        - products
+      summary: get a list of products
+      responses: 
+        200:
+          description: all the products are returned
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        500:
+          description: server error 
+    post: 
+      tags: 
+        - products
+      summary: create a product
+      requestBody:
+         content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      responses: 
+        201:
+          description: single product is created
+          content: 
+            application/json:
+              schema:
+               $ref: '#/components/schemas/Product'
+        500:
+          description: server error 
+          
+  /products/{productId}:
+    get: 
+      tags: 
+        - products
+      summary: get a single product
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      responses: 
+        200:
+          description: single product is returned
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        500:
+          description: server error 
+    delete: 
+      tags: 
+        - products
+      summary: delete a single product
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      responses: 
+        200:
+          description: delete a single product
+        500:
+          description: server error
+          
+    put: 
+      tags: 
+        - products
+      summary: update a single product
+      requestBody:
+         content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      responses: 
+        200:
+          description: update a single product
+          content: 
+            application/json:
+              schema:
+               $ref: '#/components/schemas/Product'
+        500:
+          description: server error
+          
+  /products/search:       
+    get: 
+      tags: 
+        - products
+      summary: search products
+      parameters:
+        - in: query
+          name: search
+          required: true
+          schema:
+            type: string
+      responses: 
+        200:
+          description: all the products are returned based on the search value
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        500:
+          description: server error 
+   
+  /users:
+    get: 
+      tags: 
+        - users
+      summary: get a list of users
+      responses: 
+        200:
+          description: all the users are returned
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        500:
+          description: server error       
