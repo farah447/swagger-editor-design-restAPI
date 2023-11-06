@@ -6,11 +6,11 @@ info:
   description: API for E-commerce platform
   contact:
     email: alharbi.farah@hotmail.com
-  
+
 servers:
   - url: http://localhost:3001
-  
-tags: 
+
+tags:
   - name: products
     description: every thing about products
   - name: users
@@ -19,8 +19,7 @@ tags:
     description: every thing about orders
   - name: category
     description: every thing about category
-    
-  
+
 components:
   schemas:
     Product:
@@ -35,15 +34,15 @@ components:
           description: the id of the product will be automatically generated in the backend
         title:
           type: string
-          description: the title of the product 
+          description: the title of the product
         price:
           type: number
           description: the price of the product
         description:
           type: string
-          description: the description of the product 
+          description: the description of the product
         category:
-          type: string
+          $ref: "#/components/schemas/Category"
           description: the category of the product
         image:
           type: string
@@ -65,7 +64,7 @@ components:
         rating:
           rate: 3.9
           count: 120
-          
+
     User:
       type: object
       required:
@@ -78,19 +77,19 @@ components:
           description: the id of the user will be automatically generated in the backend
         name:
           type: string
-          description: the name of the user 
+          description: the name of the user
         email:
           type: string
           description: the email of the user
         password:
-          type: number
-          description: the password of the user 
+          type: string
+          description: the password of the user
       example:
         id: 1
         name: farah alharbi
         email: alharbi.farah@hotmail.com
-        password: 123456
-        
+        password: "123456"
+
     Order:
       type: object
       required:
@@ -104,57 +103,90 @@ components:
         products:
           type: array
           description: the name of the order
-          items: 
-            $ref: '#/components/schemas/Product'
+          items:
+            $ref: "#/components/schemas/Product"
         totalPrice:
           type: number
           description: the price of the order
-      example:
-        id: 1
-        name: farah alharbi
-        email: alharbi.farah@hotmail.com
-        password: 123456
-        
-        
+
+    category:
+      type: object
+      required:
+        - id
+        - name
+        - description
+      properties:
+        id:
+          type: string
+          description: the id of the order will be automatically generated in the backend
+        name:
+          type: array
+          description: the name of the order
+          items:
+            $ref: "#/components/schemas/Product"
+        description:
+          type: number
+          description: the price of the order
+
 paths:
   /products:
-    get: 
-      tags: 
+    get:
+      tags:
         - products
       summary: get a list of products
-      responses: 
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: number
+          required: false
+        - in: query
+          name: limit
+          schema:
+            type: number
+          required: false
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum:
+              - "asc"
+              - "desc"
+          required: false
+      responses:
         200:
           description: all the products are returned
-          content: 
+          content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
+                  $ref: "#/components/schemas/Product"
         500:
-          description: server error 
-    post: 
-      tags: 
+          description: server error
+
+    post:
+      tags:
         - products
       summary: create a product
       requestBody:
-         content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-      responses: 
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
         201:
           description: single product is created
-          content: 
+          content:
             application/json:
               schema:
-               $ref: '#/components/schemas/Product'
+                $ref: "#/components/schemas/Product"
         500:
-          description: server error 
-          
+          description: server error
+
   /products/{productId}:
-    get: 
-      tags: 
+    get:
+      tags:
         - products
       summary: get a single product
       parameters:
@@ -163,17 +195,20 @@ paths:
           required: true
           schema:
             type: string
-      responses: 
+      responses:
         200:
           description: single product is returned
-          content: 
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: "#/components/schemas/Product"
+        404:
+          description: prouduct is not found
         500:
-          description: server error 
-    delete: 
-      tags: 
+          description: server error
+
+    delete:
+      tags:
         - products
       summary: delete a single product
       parameters:
@@ -182,73 +217,408 @@ paths:
           required: true
           schema:
             type: string
-      responses: 
+      responses:
         200:
           description: delete a single product
+        404:
+          description: prouduct is not found
         500:
           description: server error
-          
-    put: 
-      tags: 
+
+    put:
+      tags:
         - products
       summary: update a single product
       requestBody:
-         content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
       parameters:
         - in: path
           name: productId
           required: true
           schema:
             type: string
-      responses: 
+      responses:
         200:
           description: update a single product
-          content: 
+          content:
             application/json:
               schema:
-               $ref: '#/components/schemas/Product'
+                $ref: "#/components/schemas/Product"
+        404:
+          description: prouduct is not found
         500:
           description: server error
-          
-  /products/search:       
-    get: 
-      tags: 
+
+  /products/searchText:
+    get:
+      tags:
         - products
       summary: search products
       parameters:
         - in: query
-          name: search
+          name: searchText
           required: true
           schema:
             type: string
-      responses: 
+      responses:
         200:
           description: all the products are returned based on the search value
-          content: 
+          content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
+                  $ref: "#/components/schemas/Product"
+        404:
+          description: prouduct is not found
         500:
-          description: server error 
-   
+          description: server error
+
   /users:
-    get: 
-      tags: 
+    get:
+      tags:
         - users
       summary: get a list of users
-      responses: 
+      responses:
         200:
-          description: all the users are returned
-          content: 
+          description: all the products are returned
+          content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: "#/components/schemas/Product"
         500:
-          description: server error       
+          description: server error
+
+    post:
+      tags:
+        - users
+      summary: create a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        201:
+          description: single user is created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        500:
+          description: server error
+
+  /users/{userId}:
+    get:
+      tags:
+        - users
+      summary: get a single user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: single user is returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        404:
+          description: user is not found
+        500:
+          description: server error
+
+    delete:
+      tags:
+        - users
+      summary: delete a single user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: delete a single user
+        404:
+          description: user is not found
+        500:
+          description: server error
+
+    put:
+      tags:
+        - users
+      summary: update a single user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: update a single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        404:
+          description: user is not found
+        500:
+          description: server error
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: user authenticated successfully
+        404:
+          description: unauthorized
+        500:
+          description: server error
+
+  /users/logout:
+    post:
+      tags:
+        - users
+      summary: logout
+      responses:
+        200:
+          description: user logged out successfully
+        500:
+          description: server error
+
+  /categories:
+    get:
+      tags:
+        - categories
+      summary: get a list of categories
+      responses:
+        200:
+          description: all the categories are returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+        500:
+          description: server error
+
+    post:
+      tags:
+        - categories
+      summary: create a category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+      responses:
+        201:
+          description: single category is created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        500:
+          description: server error
+
+  /categories/{categoryId}:
+    get:
+      tags:
+        - categories
+      summary: get a single category
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: single category is returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        404:
+          description: category is not found
+        500:
+          description: server error
+
+    delete:
+      tags:
+        - categories
+      summary: delete a single category
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: delete a single category
+        404:
+          description: category is not found
+        500:
+          description: server error
+
+    put:
+      tags:
+        - categories
+      summary: update a single category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: update a single category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        404:
+          description: category is not found
+        500:
+          description: server error
+
+  /orders:
+    get:
+      tags:
+        - orders
+      summary: get a list of orders
+      responses:
+        200:
+          description: all the orders are returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+        500:
+          description: server error
+
+    post:
+      tags:
+        - orders
+      summary: create an order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      responses:
+        201:
+          description: single order is created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        500:
+          description: server error
+
+  /orders/{orderId}:
+    get:
+      tags:
+        - orders
+      summary: get a single order
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: single order is returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        404:
+          description: order is not found
+        500:
+          description: server error
+
+    delete:
+      tags:
+        - order
+      summary: delete a single order
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: delete a single order
+        404:
+          description: order is not found
+        500:
+          description: server error
+
+    put:
+      tags:
+        - orders
+      summary: update a single order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      parameters:
+        - in: path
+          name: order
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: update a single order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        404:
+          description: order is not found
+        500:
+          description: server error
